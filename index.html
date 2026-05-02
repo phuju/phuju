@@ -875,5 +875,15 @@ function switchTab(person, tab) {
   activeBtn.style.borderColor = col;
 }
 </script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js");
+  });
+}
+</script>
+
+</body>
+</html>
 </body>
 </html>
