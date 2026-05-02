@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="The System">
+<meta name="theme-color" content="#0A0A0A">
+<title>The System</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap');
+
+  :root {
+    --bg: #0A0A0A;
+    --bg2: #111111;
+    --bg3: #1A1A1A;
+    --border: #222222;
+    --text: #E5E5E5;
+    --muted: #888888;
+    --dim: #444444;
+    --him: #F97316;
+    --him-dim: #7C3100;
+    --her: #EC4899;
+    --her-dim: #831843;
+    --accent: #F97316;
+    --accent-dim: #7C3100;
+    --green: #22C55E;
+    --red: #EF4444;
+    --yellow: #F59E0B;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Crimson Pro', Georgia, serif;
+    min-height: 100vh;
+    overscroll-behavior: none;
+  }
+
+  /* PERSON SWITCHER */
+  .person-bar {
+    display: flex;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+  .person-btn {
+    flex: 1;
+    padding: 14px 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 17px;
+    letter-spacing: 2px;
+    color: var(--dim);
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+  }
+  .person-btn.him.active { color: var(--him); border-color: var(--him); }
+  .person-btn.her.active { color: var(--her); border-color: var(--her); }
+
+  /* HEADER */
+  .header {
+    padding: 28px 20px 22px;
+    border-bottom: 2px solid var(--accent);
+    background: linear-gradient(135deg, #111 55%, var(--accent-dim) 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--accent-dim) 0%, transparent 70%);
+    opacity: 0.4;
+  }
+  .header-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .header-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    line-height: 1;
+    letter-spacing: 2px;
+  }
+  .header-title span { color: var(--accent); }
+  .header-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 8px;
+  }
+  .stats-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 18px;
+    flex-wrap: wrap;
+  }
+  .stat-box {
+    background: rgba(0,0,0,0.4);
+    border: 1px solid #2A2A2A;
+    border-radius: 8px;
+    padding: 8px 12px;
+    flex: 1 1 auto;
+    min-width: 90px;
+  }
+  .stat-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--dim);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .stat-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-top: 2px;
+  }
+  .injury-banner {
+    margin-top: 14px;
+    background: rgba(239,68,68,0.1);
+    border: 1px solid #7F1D1D;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #FCA5A5;
+    line-height: 1.6;
+  }
+  .injury-banner strong { color: #EF4444; letter-spacing: 1px; font-size: 10px; text-transform: uppercase; display: block; margin-bottom: 4px; }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 45px;
+    z-index: 99;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 12px 4px;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--dim);
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+  .tab-btn.active { color: var(--accent); border-color: var(--accent); }
+
+  /* CONTENT */
+  .content { padding: 18px 16px 80px; }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+  }
+  .section-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 18px;
+  }
+  .section-sub span { color: var(--accent); }
+
+  /* ACCORDION */
+  .accordion {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .accordion-header {
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    color: var(--text);
+    text-align: left;
+  }
+  .accordion-header-left { flex: 1; }
+  .acc-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .acc-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+  .acc-arrow {
+    font-size: 20px;
+    font-weight: 300;
+    line-height: 1;
+    transition: transform 0.2s;
+    flex-shrink: 0;
+    margin-left: 10px;
+  }
+  .accordion-body { display: none; padding: 0 16px 16px; }
+  .accordion.open .accordion-body { display: block; }
+  .accordion.open .acc-arrow { transform: rotate(45deg); }
+
+  /* OPTION CARD */
+  .option-card {
+    background: #0D0D0D;
+    border: 1px solid #2A2A2A;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 10px;
+  }
+  .option-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .option-item {
+    font-size: 13px;
+    color: #CCC;
+    padding: 3px 0 3px 12px;
+    border-left: 1px solid #333;
+    margin-bottom: 3px;
+  }
+  .dessert-card {
+    background: #0D0D0D;
+    border: 1px solid rgba(245,158,11,0.3);
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 4px;
+  }
+  .dessert-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: #F59E0B;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .dessert-text { font-size: 13px; color: #CCC; }
+
+  /* EXERCISE ROW */
+  .exercise-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 1px solid #1A1A1A;
+    padding: 10px 0;
+    gap: 10px;
+  }
+  .exercise-name { font-size: 14px; font-weight: 600; color: var(--text); }
+  .exercise-note { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); margin-top: 3px; line-height: 1.5; }
+  .exercise-sets {
+    background: #0D0D0D;
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* INJURY NOTE */
+  .injury-note {
+    background: rgba(239,68,68,0.08);
+    border: 1px solid rgba(239,68,68,0.3);
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin-bottom: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #FCA5A5;
+    line-height: 1.6;
+  }
+  .workout-note {
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin-bottom: 12px;
+    font-size: 12px;
+    color: #AAA;
+    line-height: 1.6;
+    border: 1px solid #222;
+    background: #0D0D0D;
+  }
+
+  /* STAT HIGHLIGHT */
+  .highlight-card {
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+  .highlight-card.good { background: #0A1A0A; border: 1px solid #14532D; border-left: 3px solid var(--green); }
+  .highlight-card.bad { background: #1A0A0A; border: 1px solid #7F1D1D; border-left: 3px solid var(--red); }
+  .highlight-card.warn { background: #1A1400; border: 1px solid #713F12; border-left: 3px solid var(--yellow); }
+  .highlight-tag { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 1px; margin-bottom: 4px; }
+  .highlight-val { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 5px; }
+  .highlight-note { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+  /* RULE CARD */
+  .rule-card {
+    display: flex;
+    gap: 14px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 10px;
+    align-items: flex-start;
+  }
+  .rule-num {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; font-weight: 700;
+    flex-shrink: 0;
+    color: #000;
+  }
+  .rule-text { font-size: 13px; color: #CCC; line-height: 1.7; padding-top: 2px; }
+
+  /* TOTALS */
+  .totals-card {
+    border-radius: 10px;
+    padding: 16px;
+    margin-top: 8px;
+  }
+  .totals-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
+  .totals-val { font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 700; color: var(--accent); margin-top: 4px; }
+  .totals-macro { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  /* CONTRACT */
+  .contract {
+    margin-top: 20px;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+  }
+  .contract-title { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 3px; margin-bottom: 10px; }
+  .contract-text { font-size: 13px; color: var(--muted); line-height: 1.9; font-style: italic; margin-bottom: 16px; }
+  .contract-footer { border-top: 1px solid var(--border); padding-top: 12px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--dim); letter-spacing: 2px; }
+
+  /* ROADMAP */
+  .roadmap-card {
+    display: flex;
+    gap: 14px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 10px;
+  }
+  .roadmap-num {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; font-weight: 700;
+    flex-shrink: 0;
+    color: #000;
+  }
+  .roadmap-week { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 1px; margin-bottom: 4px; }
+  .roadmap-text { font-size: 13px; color: #CCC; line-height: 1.6; }
+
+  .bottom-line {
+    border-radius: 10px;
+    padding: 16px;
+    margin-top: 8px;
+  }
+  .bottom-line-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 8px; }
+  .bottom-line-text { font-size: 13px; color: #CCC; line-height: 1.8; }
+
+  /* HIDDEN */
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- PERSON SWITCHER -->
+<div class="person-bar">
+  <button class="person-btn him active" onclick="switchPerson('him')">🔥 MY PLAN</button>
+  <button class="person-btn her" onclick="switchPerson('her')">💗 HER PLAN</button>
+</div>
+
+<!-- ======================== HIM ======================== -->
+<div id="plan-him">
+  <div class="header" style="--accent:#F97316;--accent-dim:#7C3100;">
+    <div class="header-label">Personalized · No Equipment · Knee-Safe</div>
+    <div class="header-title">THE SYSTEM<br><span>117.7kg → LEAN</span></div>
+    <div class="header-sub">23M · 5'11" · Yoga mat only · 3 meals/day</div>
+    <div class="stats-row">
+      <div class="stat-box"><div class="stat-label">Calories</div><div class="stat-val" style="color:#F97316">2,200 kcal</div></div>
+      <div class="stat-box"><div class="stat-label">Protein</div><div class="stat-val" style="color:#F97316">~130g</div></div>
+      <div class="stat-box"><div class="stat-label">Steps</div><div class="stat-val" style="color:#F97316">8–10k</div></div>
+      <div class="stat-box"><div class="stat-label">Water</div><div class="stat-val" style="color:#F97316">4L/day</div></div>
+    </div>
+  </div>
+
+  <div class="tabs" id="tabs-him">
+    <button class="tab-btn active" onclick="switchTab('him','diet')" id="him-tab-diet">🍽 Diet</button>
+    <button class="tab-btn" onclick="switchTab('him','workout')" id="him-tab-workout">🏋 Workout</button>
+    <button class="tab-btn" onclick="switchTab('him','progress')" id="him-tab-progress">📈 Progress</button>
+    <button class="tab-btn" onclick="switchTab('him','rules')" id="him-tab-rules">📋 Rules</button>
+  </div>
+
+  <!-- HIM DIET -->
+  <div class="content" id="him-diet">
+    <div class="section-sub"><span>2,200 kcal</span> · <span>~130g protein</span> · <span>3 meals · no snacks needed</span><br>Drink 500ml water before each meal. Lunch = biggest meal.</div>
+
+    <!-- Breakfast -->
+    <div class="accordion" style="border-left:3px solid #F97316">
+      <button class="accordion-header" onclick="toggle(this.parentElement)">
+        <div class="accordion-header-left">
+          <div class="acc-label" style="color:#F97316">Breakfast</div>
+          <div class="acc-sub">Within 1–2 hrs of waking · ~550 kcal · ~40g protein</div>
+        </div>
+        <div class="acc-arrow" style="color:#F97316">+</div>
+      </button>
+      <div class="accordion-body">
+        <div class="option-card"><div class="option-label" style="color:#F97316">Option A</div><div class="option-item">3 whole eggs (boiled/scrambled)</div><div class="option-item">50g bread (2 slices)</div><div class="option-item">100ml low-fat milk</div><div class="option-item">1 small fruit (banana/apple)</div><div class="option-item">Black coffee / green tea</div></div>
+        <div class="option-card"><div class="option-label" style="color:#F97316">Option B</div><div class="option-item">60g soya chunks (soaked & cooked)</div><div class="option-item">2 rotis (80g)</div><div class="option-item">100g curd</div><div class="option-item">Black coffee / green tea</div></div>
+        <div class="option-card"><div class="option-label" style="color:#F97316">Option C</div><div class="option-item">100g low-fat paneer bhurji</div><div class="option-item">50g bread / 1 roti</div><div class="option-item">100ml milk</div><div class="option-item">1 fruit</div></div>
+      </div>
+    </div>
+
+    <!-- Lunch -->
+    <div class="accordion" style="border-left:3px solid #10B981">
+      <button class="accordion-header" onclick="toggle(this.parentElement)">
+        <div class="accordion-header-left">
+          <div class="acc-label" style="color:#10B981">Lunch</div>
+          <div class="acc-sub">Afternoon · biggest meal · ~850 kcal · ~50g protein</div>
+        </div>
+        <div class="acc-arrow" style="color:#10B981">+</div>
+      </button>
+      <div class="accordion-body">
+        <div class="option-card"><div class="option-label" style="color:#10B981">Option A (Non-Veg)</div><div class="option-item">150–200g chicken breast (grilled/boiled)</div><div class="option-item">200g cooked rice</div><div class="option-item">Big bowl salad (cucumber, carrot, tomato, onion)</div><div class="option-item">100g curd</div><div class="option-item">3g ghee</div></div>
+        <div class="option-card"><div class="option-label" style="color:#10B981">Option B (Veg)</div><div class="option-item">200g dal (any)</div><div class="option-item">100g low-fat paneer</div><div class="option-item">1–2 rotis (60g)</div><div class="option-item">Big bowl salad</div><div class="option-item">5g ghee</div></div>
+        <div class="option-card"><div class="option-label" style="color:#10B981">Option C</div><div class="option-item">100g soya chunks curry</div><div class="option-item">200g cooked rice</div><div class="option-item">100g curd</div><div class="option-item">Salad on the side</div></div>
+      </div>
+    </div>
+
+    <!-- Dinner -->
+    <div class="accordion" style="border-left:3px solid #3B82F6">
+      <button class="accordion-header" onclick="toggle(this.parentElement)">
+        <div class="accordion-header-left">
+          <div class="acc-label" style="color:#3B82F6">Dinner</div>
+          <div class="acc-sub">2+ hrs before sleep · lighter · ~700 kcal · ~40g protein</div>
+        </div>
+        <div class="acc-arrow" style="color:#3B82F6">+</div>
+      </button>
+      <div class="accordion-body">
+        <div class="option-card"><div class="option-label" style="color:#3B82F6">Option A</div><div class="option-item">200g dal</div><div class="option-item">2 rotis (80g)</div><div class="option-item">100g curd</div><div class="option-item">Sabzi / mixed veggies</div><div class="option-item">3g ghee</div></div>
+        <div class="option-card"><div class="option-label" style="color:#3B82F6">Option B (Non-Veg)</div><div class="option-item">150g chicken</div><div class="option-item">150g cooked rice</div><div class="option-item">Mixed veggies stir fry</div><div class="option-item">100g curd</div></div>
+        <div class="option-card"><div class="option-label" style="color:#3B82F6">Option C</div><div class="option-item">50g soya chunks</div><div class="option-item">100g low-fat paneer</div><div class="option-item">2 rotis</div><div class="option-item">Big bowl salad</div></div>
+        <div class="dessert-card"><div class="dessert-label">🍫 Dessert (pick one)</div><div class="dessert-text">40g ice cream · OR · 25g dark chocolate · OR · 100g Greek yogurt</div></div>
+      </div>
+    </div>
+
+    <div class="totals-card" style="background:linear-gradient(135deg,#111,rgba(124,49,0,0.3));border:1px solid rgba(249,115,22,0.3)">
+      <div class="totals-label">Daily Total</div>
+      <div class="totals-val" style="color:#F97316">~2,100–2,200 kcal</div>
+      <div class="totals-macro">Protein ~130g · Carbs ~250g · Fat ~55g</div>
+    </div>
+  </div>
+
+  <!-- HIM WORKOUT -->
+  <div class="content hidden" id="him-workout">
+    <div class="section-sub">Yoga mat only · No jumping · Knee-safe<br><span>3 training days · 2 walking days · 2 rest days</span></div>
+
+    <div id="him-workout-days"></div>
+  </div>
+
+  <!-- HIM PROGRESS -->
+  <div class="content hidden" id="him-progress">
+    <div class="section-title">90-Day Roadmap</div>
+    <div class="section-sub">Realistic target: <span>8–12kg fat loss in 90 days</span><br>That's 105–110kg by day 90. Visceral fat drops significantly.</div>
+
+    <div class="roadmap-card"><div class="roadmap-num" style="background:#F97316">1</div><div><div class="roadmap-week" style="color:#F97316">Week 1–2</div><div class="roadmap-text">Wall push-ups · Glute bridges · Getting consistent. Form over everything.</div></div></div>
+    <div class="roadmap-card"><div class="roadmap-num" style="background:#F97316">2</div><div><div class="roadmap-week" style="color:#F97316">Week 3–4</div><div class="roadmap-text">Incline push-ups · Single-leg bridges · Aim for 8,000 steps daily.</div></div></div>
+    <div class="roadmap-card"><div class="roadmap-num" style="background:#F97316">3</div><div><div class="roadmap-week" style="color:#F97316">Week 5–8</div><div class="roadmap-text">Full push-ups (attempt) · Mountain climbers faster · 10,000 steps.</div></div></div>
+    <div class="roadmap-card"><div class="roadmap-num" style="background:#F97316">4</div><div><div class="roadmap-week" style="color:#F97316">Week 9–12</div><div class="roadmap-text">Consider joining a gym. Your knees will handle more load by now. Barbell work unlocked.</div></div></div>
+
+    <div class="bottom-line" style="background:rgba(34,197,94,0.07);border:1px solid #14532D;margin-top:16px
